@@ -1,0 +1,23 @@
+{
+  "name": "typescript",
+  "version": "1.0.0",
+  "description": "study typescript",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "lite-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sik9252/STUDY-typescript.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sik9252/STUDY-typescript/issues"
+  },
+  "homepage": "https://github.com/sik9252/STUDY-typescript#readme",
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
