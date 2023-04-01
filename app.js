@@ -1,7 +1,15 @@
-function add(num1, num2) {
-    return num1 + num2;
+var Role;
+(function (Role) {
+    Role[Role["ADMIN"] = 0] = "ADMIN";
+    Role[Role["READ_ONLY"] = 1] = "READ_ONLY";
+    Role[Role["AUTHOR"] = 2] = "AUTHOR";
+})(Role || (Role = {}));
+var person = {
+    name: "kevin",
+    age: 30,
+    hobbies: ["Sports", "Cooking"],
+    role: Role.ADMIN,
+};
+if (person.role === Role.ADMIN) {
+    console.log("is admin...");
 }
-var n1 = '5';
-var n2 = 2.8;
-var result = add(n1, n2);
-console.log(result);

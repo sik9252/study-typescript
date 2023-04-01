@@ -1,9 +1,16 @@
-function add(num1: number, num2: number) {
-  return num1 + num2;
+enum Role {
+  ADMIN,
+  READ_ONLY,
+  AUTHOR,
 }
 
-const n1 = 5;
-const n2 = 2.8;
+const person = {
+  name: "kevin",
+  age: 30,
+  hobbies: ["Sports", "Cooking"],
+  role: Role.ADMIN,
+};
 
-const result = add(n1, n2);
-console.log(result);
+if (person.role === Role.ADMIN) {
+  console.log("is admin...");
+}
