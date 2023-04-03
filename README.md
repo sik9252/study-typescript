@@ -341,3 +341,107 @@ if (person.role === Role.ADMIN) {
   console.log("is author...");
 }
 ```
+
+---
+
+### ANY type
+
+일단, 남발하면 타입스크립트의 의미를 해치게 되므로 되도록이면 사용하지 않는 것이 좋은 타입이다.
+
+다만, 어떤 값이나 종류의 데이터가 어디에 저장될지 전혀 알 수 없는 경우에 대비하거나 런타임 도중 특정 값에 수행하고자 하는 작업의 범위를 좁히기 위해 사용하는 경우가 있다.
+
+타입스크립트가 제 역할을 다하도록 작업 도중 어떤 종류의 데이터를 사용하는지 확실하게 정리하자!
+
+---
+
+### UNION type
+
+아래와 같이 입력값 2개를 combine 해주는 함수가 있다고 가정하자.
+
+```ts
+function combine(input1: number, input2: number) {
+  const result = input1 + input2;
+  return result;
+}
+```
+
+input1, input2에 각각 20과 30이란 숫자를 넣으면 result 값이 50으로 제대로 출력되지만, input1, input2에 'ABC', 'DEF'라는 문자열을 넣으면 input1과 input2의 타입이 각각 number로 설정되어있기 때문에 오류가 발생한다.
+
+그러나 나는 input1, input2에 `숫자도 넣을 수 있고 문자로 넣을 수` 있길 바란다. 이러한 경우 `조합 타입(UNION TYPE)을 사용`한다.
+
+```ts
+function combine(input1: number | string, input2: number | string) {
+  let result;
+
+  if (typeof input1 === "number" && typeof input2 === "number") {
+    result = input1 + input2;
+  } else {
+    result = input1.toString() + input2.toString();
+  }
+
+  return result;
+}
+```
+
+**[정리] UNION type**  
+타입을 조금 더 유연하게 사용할 수 있도록 해주는 역할
+
+<사용법>
+
+타입1 | 타입2 | 타입3  
+ex) input1: number | string
+
+---
+
+### Literal type
+
+단순한 특정 변수나 매개변수 또는 숫자나 문자열도 아니며 정확한 값을 가지는 타입
+
+앞서 공부했던 코드에 resultConversion이란 매개변수를 추가하고 최종적으로는 아래 코드처럼 수정해보자. resultConversion은 입력된 두 값(input1, input2)이 number인지 string인지 판단하게 해주는 값을 적는 곳이다.
+
+```ts
+function combine(
+  input1: number | string,
+  input2: number | string,
+  resultConversion: string
+) {
+  let result;
+
+  if (
+    (typeof input1 === "number" && typeof input2 === "number") ||
+    resultConversion === "as-number"
+  ) {
+    // input 앞에 +는 parseFloat을 대신할 수 있는 기호
+    result = +input1 + +input2;
+  } else {
+    result = input1.toString() + input2.toString();
+  }
+
+  return result;
+}
+
+const combinedAges = combine(30, 26, "as-number");
+console.log(combinedAges); // 56
+
+const combinedStringAges = combine("30", "26", "as-number");
+console.log(combinedStringAges); // 56
+
+const combinedNames = combine("ABC", "DEF", "as-string");
+console.log(combinedNames); // ABCDEF
+```
+
+input1, input2에 각각 "30", "26"의 string 값을 줘도 resultConversion 값으로 as-number을 주면 정상적으로 56으로 출력됨을 알 수 있다.
+
+하지만, 이렇게 작성할 경우 사용할 때마다 매번 as-number인지 as-string인지 값을 기억하고 있어야 하는 번거로움이 있는데 이는 enum으로 개선할 수 있지만 값이 해당 예시처럼 2, 3개정도뿐이라면 literal type을 이용할 수 있다.
+
+```ts
+function combine(
+  input1: number | string,
+  input2: number | string,
+  resultConversion: "as-number" | "as-string" // 이렇게 !
+) {
+  //...
+}
+```
+
+---
