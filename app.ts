@@ -1,27 +1,16 @@
-function combine(
-  input1: number | string,
-  input2: number | string,
-  resultConversion: string
-) {
-  let result;
+//let userInput: any;
+let userInput: unknown;
+let userName: string;
 
-  if (
-    (typeof input1 === "number" && typeof input2 === "number") ||
-    resultConversion === "as-number"
-  ) {
-    result = +input1 + +input2;
-  } else {
-    result = input1.toString() + input2.toString();
-  }
+userInput = 5;
+userInput = "ABC";
 
-  return result;
+if (typeof userInput === "string") {
+  userName = userInput; // 정상 작동
 }
 
-const combinedAges = combine(30, 26, "as-number");
-console.log(combinedAges);
+function generateError(message: string, code: number) {
+  throw { message: message, errorCode: code };
+}
 
-const combinedStringAges = combine("30", "26", "as-number");
-console.log(combinedStringAges);
-
-const combinedNames = combine("ABC", "DEF", "as-string");
-console.log(combinedNames);
+generateError("An error occurred!", 500);

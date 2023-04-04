@@ -92,8 +92,6 @@ console.log(result);
 
 ---
 
-퀴즈
-
 **Q. "타입"이 바닐라 자바스크립트보다 유용하며 큰 이점을 제공하는 이유는?**
 
 A. 타입을 사용하면 오류를 미리 감지하고 일부 런타임 오류를 방지할 수 있다.
@@ -443,5 +441,339 @@ function combine(
   //...
 }
 ```
+
+---
+
+### Type Alias(별칭)
+
+```ts
+type Combinable = number | string;
+type conversionDescriptor = "as-number" | "as-text";
+
+function combine(
+  input1: Combinable, // number | string
+  input2: Combinable,
+  resultConversion: conversionDescriptor // "as-number" | "as-text"
+) {
+  //...
+}
+```
+
+위 코드처럼 타입 별칭을 사용해 사용자 타입을 직접 생성할 수 있다.
+이러한 타입 별칭을 사용하면 불필요한 중복을 줄이고 타입을 한번에 관리할 수 있다는 장점이 있다.
+
+아래와 같은 코드가 있다고 가정하고 이를 type alias를 이용해 단순화 해보자.
+
+**type alias 적용 전**
+
+```ts
+function greet(user: { name: string; age: number }) {
+  console.log("Hi, I am " + user.name);
+}
+
+function isOlder(user: { name: string; age: number }, checkAge: number) {
+  return checkAge > user.age;
+}
+```
+
+**type alias 적용 후**
+
+```ts
+type UserType = { name: string; age: number };
+
+function greet(user: UserType) {
+  console.log("Hi, I am " + user.name);
+}
+
+function isOlder(user: UserType, checkAge: number) {
+  return checkAge > user.age;
+}
+```
+
+---
+
+**Q. 다음 코드 스니펫 중 열거형 타입을 사용하여 단순화할 수 있는 것은?**
+
+```ts
+const users = ["Max", "Michael", "Julie"];
+
+const userA = { name: "Max" };
+const userB = { name: "Michael" };
+
+const ROLE_ADMIN = 0;
+const ROLE_AUTHOR = 1;
+```
+
+A.
+
+```ts
+const ROLE_ADMIN = 0;
+const ROLE_AUTHOR = 1;
+```
+
+```ts
+enum Role {
+  ROLE_ADMIN,
+  ROLE_AUTHOR,
+}
+
+// ROLE_ADMIN -> Role.ROLE_ADMIN;
+// ROLE_AUTHOR -> Role.ROLE_AUTHOR;
+```
+
+**Q. 다음 코드는 컴파일 오류를 발생시키나?**
+
+```ts
+type User = { name: string; age: number };
+const u1: User = ["Max", 29];
+```
+
+A. 발생시킨다. User 타입은 배열이 아니라 name과 age 속성을 포함하는 객체 타입인데 User 타입을 사용하는 u1 변수에 배열을 할당했기 때문이다.
+
+**Q. 이 코드는 컴파일을 통과할 수 있나?**
+
+```ts
+type Product = { title: string; price: number };
+const p1: Product = { title: "A Book", price: 12.99, isListed: true };
+```
+
+A. 통과하지 못한다. isListed라는 속성은 Product의 타입에 포함되지 않는 속성이기 때문이다.
+
+**Q. 이 코드는 컴파일을 통과할 수 있나?**
+
+```ts
+type User = { name: string } | string;
+let u1: User = { name: "Max" };
+u1 = "Michael";
+```
+
+A. 통과할 수 있다. User 타입으로 설정한 유니온 타입은 name 속성을 포함하는 객체 또는 문자열을 허용하기 때문이다.
+
+---
+
+### 함수의 반환 타입
+
+```ts
+function add(n1: number, n2: number): number {
+  // 여기
+  return n1 + n2;
+}
+```
+
+그러나 함수의 반환 타입을 명시적으로 설정할 이유가 굳이 없다면 반환 타입을 설정하는 대신 타입스크립트가 알아서 타입을 추론하게 놔두는 것이 좋다.
+
+아래 코드처럼 반환하는 것이 없는 함수는 void라는 반환 타입을 가지고 있다. 굳이 :void 명시 안해줘도 알아서 추론한다.
+
+```ts
+function printResult(num: number) {
+  console.log("Result: " + num);
+}
+
+function printResult(num: number): void {
+  console.log("Result: " + num);
+}
+```
+
+자바스크립트에서 아무것도 반환하지 않는 함수의 반환 값을 사용하면 undefined가 값으로 출력된다.
+
+추가적으로 undefined는 타입스크립트에서는 타입이다. 고로 undefined도 타입으로 사용할 수 있다.  
+`let value: undefined`
+
+---
+
+### 타입의 기능을 하는 함수
+
+타입스크립트의 타입에는 함수 타입을 나타내는 Function 타입이 존재한다.
+
+`ex) let combineValues: Function; `
+
+함수 타입은 함수의 매개변수와 반환값에 관련된 함수를 설명하는 함수로 화살표 함수 표기법 혹은 해당 표기법에 가깝게 만들어진다.
+
+```ts
+function add(n1: number, n2: number): number {
+  return n1 + n2;
+}
+
+function printResult(num: number): void {
+  console.log("Result: " + num); // 8
+}
+
+// combineValues의 타입은 함수가 되어야함을 명시
+let combineValues: Function;
+
+combineValues = add;
+combineValues = printResult;
+
+console.log(combineValues(8, 8)); // undefined
+```
+
+마지막 console.log에서 undefined가 뜨는 이유는 내가 출력하고 싶은 것은 add함수의 실행 결과인데, combineValues = printResult로 올바르지 않은 함수를 저장했기 때문이다.
+
+따라서 이러한 것을 방지하기 위해 `함수가 어떻게 동작해야 할지 명확하게 정의하는 방식을 사용`할 수 있다.
+
+```ts
+function add(n1: number, n2: number): number {
+  return n1 + n2;
+}
+
+function printResult(num: number): void {
+  console.log("Result: " + num);
+}
+
+//let combineValues: Function;
+
+// 타입이 number인 number 타입인 매개변수가 2개 존재하고, number를 반환하는 함수를 명확하게 지정
+let combineValues: (a: number, b: number) => number;
+
+combineValues = add;
+// 이제 올바르지 않은 함수 형태가 할당되었기 때문에 여기서 오류가 발생
+combineValues = printResult;
+
+console.log(combineValues(8, 8));
+```
+
+---
+
+### 함수 콜백 타입
+
+```ts
+function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
+  // 이렇게 사용
+  const result = n1 + n2;
+  cb(result);
+}
+
+addAndHandle(10, 20, (result) => {
+  console.log(result); // 30
+});
+
+// addAndHandle 함수의 콜백 함수에서 반환 값이 없는 void로 설정했기 때문에 return을 사용해도 무효화된다.
+addAndHandle(10, 20, (result) => {
+  console.log(result); // 30
+  return result; // 무효화
+});
+```
+
+---
+
+**Q. 이 코드는 컴파일을 통과할 수 있나?**
+
+```ts
+function sendRequest(data: string, cb: (response: any) => void) {
+  // ... sending a request with "data"
+  return cb({ data: "Hi there!" });
+}
+
+sendRequest("Send this!", (response) => {
+  console.log(response);
+  return true;
+});
+```
+
+A. 통과할 수 있다. 콜백 함수는 전달되는 인수가 반환 값을 기대하지 않는 경우에도 값을 반환할 수 있기 때문이다.
+
+**Q. "함수 타입"의 개념은?**
+
+A. 함수의 매개변수 및 반환 타입을 정의하는 것
+
+**Q. 어느 코드를 사용하는 것이 더 나은가?**
+
+(1번 코드)
+
+```ts
+function sayHi(): void {
+  // ...
+}
+```
+
+(2번 코드)
+
+```ts
+function sayHi(): undefined {
+  // ...
+}
+```
+
+A. 1번 코드, 아무 값도 반환하고 싶지 않은 경우 어떤 값을 반환하도록 강요하지 않기 때문이다.
+
+---
+
+### unknown 타입
+
+에러 발생 없이 어떤 값이든 저장할 수 있는 타입이다.
+
+```ts
+let userInput: unknown;
+
+userInput = 5; // 가능
+userInput = "ABC"; // 가능
+```
+
+그럼 any랑 뭐가 다른가? 둘은 `다르게 작동`한다.
+
+아래와 같은 코드가 있다고 가정해보자.
+
+**unknown의 경우**
+
+```ts
+let userInput: unknown;
+let userName: string;
+
+userInput = 5;
+userInput = "ABC";
+
+userName = userInput; // 'unknown' 형식은 'string' 형식에 할당할 수 없습니다. 라는 오류 발생
+```
+
+userName을 string으로 지정하더라도 unknown이 알아서 string으로 인식되지 않는다.
+unknown의 경우 위의 예시에서는 아래 코드처럼 userInput에 현재 저장된 값의 타입을 확인해야 문자열을 원하는 변수에 할당할 수 있다.
+
+```ts
+let userInput: unknown;
+let userName: string;
+
+userInput = 5;
+userInput = "ABC";
+
+if (typeof userInput === "string") {
+  userName = userInput; // 정상 작동
+}
+```
+
+**any의 경우**
+
+```ts
+let userInput: any;
+let userName: string;
+
+userInput = 5;
+userInput = "ABC";
+
+userName = userInput; // 정상 작동
+```
+
+그러나 any를 사용하는 경우 오류가 발생하지 않는데, 이는 any는 아주 유연한 타입으로 타입 확인을 수행하지 않기 때문이다.
+
+역시 unknown도 마찬가지로 남발하는건 별로 좋지 않아보인다.
+
+---
+
+### 절대(never) 타입
+
+never는 아무것도 반환하지 않는 void와 다르게 함수가 반환할 수 있는 타입이다.
+
+아래와 같은 에러 핸들링 코드가 있다고 가정하자.
+
+```ts
+function generateError(message: string, code: number) {
+  throw { message: message, errorCode: code };
+}
+
+generateError("An error occurred!", 500);
+```
+
+이 함수는 아무것도 반환하지 않는 void 같아보이고 실제로 반환 타입으로 :void를 줘도 작동하지만, 엄밀히 말하면 반환 값을 생성하지 않을뿐, "절대(:never)"를 반환한다.
+
+:never를 적어주면 코드 품질의 관점에서 의도를 분명히 할 수 있을 것이다.
 
 ---
