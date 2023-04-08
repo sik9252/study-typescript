@@ -1,6 +1,7 @@
+"use strict";
 //let userInput: any;
-var userInput;
-var userName;
+let userInput;
+let userName;
 userInput = 5;
 userInput = "ABC";
 if (typeof userInput === "string") {

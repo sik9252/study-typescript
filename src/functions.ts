@@ -1,4 +1,4 @@
-function add(n1: number, n2: number): number {
+function add2(n1: number, n2: number): number {
   return n1 + n2;
 }
 
@@ -8,16 +8,16 @@ function printResult(num: number): void {
 
 // let combineValues: Function; // 함수가 되어야함을 명시
 let combineValues: (a: number, b: number) => number; // 함수 타입이고 number를 반환
-combineValues = add;
+combineValues = add2;
 // combineValues = printResult;
 console.log(combineValues(8, 8));
 
-function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
+function add2AndHandle(n1: number, n2: number, cb: (num: number) => void) {
   const result = n1 + n2;
   return cb(result);
 }
 
-addAndHandle(10, 20, (result) => {
+add2AndHandle(10, 20, (result) => {
   console.log(result);
   return result;
 });
