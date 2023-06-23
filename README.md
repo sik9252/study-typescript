@@ -42,6 +42,10 @@ tsc는 brew install tsc로 설치한다.
 
 ---
 
+npm을 통해 `lite-server`를 설치한 후 `npm start`로 프로젝트를 실행하면 코드에 변경사항이 발견되면 즉시 반영되는 서버가 열리게 되고 `tsc -w`를 이용해 작업한 ts코드가 js로는 어떻게 표현되어있는지 확인할 수 있다.
+
+---
+
 ### 기본 타입
 
 <br>
@@ -775,5 +779,108 @@ generateError("An error occurred!", 500);
 이 함수는 아무것도 반환하지 않는 void 같아보이고 실제로 반환 타입으로 :void를 줘도 작동하지만, 엄밀히 말하면 반환 값을 생성하지 않을뿐, "절대(:never)"를 반환한다.
 
 :never를 적어주면 코드 품질의 관점에서 의도를 분명히 할 수 있을 것이다.
+
+---
+
+### 클래스
+
+클래스: 객체를 만들어내기 위한 설계도(틀), 연관되어있는 변수와 메서드 집합
+
+아래 코드는 `error: 속성 'name'은(는) 이니셜라이저가 없고 생성자에 할당되어 있지 않습니다.`를 뱉어낸다.
+
+```ts
+class Department {
+  name: string;
+}
+```
+
+constructor를 이용해 객체의 초기 상태를 지정해주면 에러가 사라진다.
+
+constructor: 객체가 생성될 때 실행되기로 약속한 함수로 클래스 문의 외부에서 해당 클래스가 new라는 keyword를 사용해서 변수에 객체를 생성할 때 호출된다.
+
+```ts
+class Department {
+  name: string;
+
+  constructor(n: string) {
+    this.name = n;
+  }
+}
+```
+
+<결과>
+
+```ts
+class Department {
+  name: string;
+
+  constructor(n: string) {
+    this.name = n;
+  }
+}
+
+const accounting = new Department("Accounting");
+console.log(accounting); // Department {name: 'Accounting'}
+```
+
+---
+
+### 생성자 함수와 this 그리고 public, private
+
+```ts
+class Department {
+  public name: string;
+  private employees: string[] = [];
+
+  constructor(n: string) {
+    this.name = n;
+  }
+
+  // 메소드
+  describe(this: Department) {
+    console.log("Department: " + this.name);
+  }
+
+  addEmployee(employee: string) {
+    this.employees.push(employee);
+  }
+
+  printEmployeeInformation() {
+    console.log("employees count:", this.employees.length);
+    console.log(this.employees);
+  }
+}
+
+const accounting = new Department("Accounting");
+
+// employees는 private라서 접근 불가
+// 고로 employees 리스트에 직원을 추가하려면 addEmployee 메소드를 사용해야함
+// 하지만 자바스크립트에서는 구축한 버전에 따라 해당 구문이 작동할 수도 있음
+// accounting.employees[2] = "Anna";
+accounting.addEmployee("Max");
+accounting.addEmployee("Maa");
+
+accounting.printEmployeeInformation(); // 2, ["Max", "Maa"]
+```
+
+**describe() 파라미터에 this: Department를 추가한 이유**
+
+```ts
+const accounting = new Department();
+const accountingCopy = { describe: accounting.describe };
+console.log(accountingCopy); // Department: undefined
+```
+
+describe() 파라미터에 this: Department를 추가하지 않고, 위 코드를 수행하면 undefined가 나온다. 왜냐하면 this.name이 무얼 가르켜야하는지 모르기때문이다. 따라서 this: Department를 추가해준후
+
+```ts
+const accountingCopy = { name: "max", describe: accounting.describe };
+```
+
+과 같이 Department class에 해당하는 객체들을 모두 명시해주면 this.name이 제대로 작동하게 된다.
+
+**public, private**
+
+클래스의 외부에서 특정 객체 혹은 메소드에 접근하지 못하도록 설정하고싶으면 private를 추가하면된다.
 
 ---
